@@ -1,59 +1,111 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📁 Laravel File Upload System with Repository Pattern
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A robust, clean-code Laravel application demonstrating secure and organized file handling (Public & Private storage) using the **Repository Pattern**, **Service Layer**, and **Dependency Injection**.
 
-## About Laravel
+## 🎯 Project Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This project is designed to showcase advanced Laravel architectural patterns while solving a real-world problem: **Secure File Management**. It clearly separates concerns by dividing the application into Controllers (HTTP handling), Services (Business Logic), and Repositories (Data & Storage Operations).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+It handles two types of file storage:
+1. **Public Files**: Accessible directly via URL (e.g., profile pictures, public documents).
+2. **Private Files**: Securely stored outside the public web root, accessible only through a controlled, authenticated download response.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🚀 Key Features
 
-## Learning Laravel
+- ✅ **Repository Pattern**: Decouples database/storage logic from business logic.
+- ✅ **Service Layer**: Handles complex business rules (e.g., unique filename generation, disk selection).
+- ✅ **Dependency Injection**: Loose coupling via Interface binding in Service Providers.
+- ✅ **Form Request Validation**: Strict validation for file types (`mimes`), size (`max:2048`), and required fields.
+- ✅ **Dual Storage Management**: Seamless switching between `public` and `local` (private) disks.
+- ✅ **Secure Downloads**: Private files are streamed via Laravel responses, hiding the actual server path.
+- ✅ **Automatic Cleanup**: Deleting a record automatically removes the physical file from the storage disk.
+- ✅ **Clean UI**: Simple, responsive Blade templates with inline CSS for quick testing.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🏛️ Architecture & Flow
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```text
+User Request
+    ↓
+[Form Request] → Validates file (type, size, required fields)
+    ↓
+[Controller] → Thin controller, receives validated data, calls Service
+    ↓
+[Service] → Business Logic (Generates unique filename, decides disk)
+    ↓
+[Repository Interface] → Contract for storage operations
+    ↓
+[Repository] → Executes Storage::disk()->putFileAs() and DB::create()
+    ↓
+[Storage/Database] → File saved & metadata recorded
 
-## Laravel Sponsors
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-### Premium Partners
+## 🛠️ Tech Stack
+Backend: Laravel 11.x, PHP 8.2+
+Database: MySQL
+Frontend: Blade Templates, Vanilla HTML/CSS
+Architecture: Repository Pattern, Service Layer, Dependency Injection
+File Handling: Laravel Storage Facade (public & local disks)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+📂 Project Structure
+app/
+├── Http/
+│   ├── Controllers/
+│   │   └── DocumentController.php          # Thin controller (Request/Response)
+│   └── Requests/
+│       └── StoreDocumentRequest.php        # File validation rules
+├── Interfaces/
+│   └── DocumentRepositoryInterface.php     # Contract for repository methods
+├── Repositories/
+│   └── DocumentRepository.php              # Actual Storage & DB operations
+├── Services/
+│   └── DocumentService.php                 # Business logic (filename generation, disk routing)
+├── Models/
+│   └── Document.php                        # Eloquent model with $fillable
+└── Providers/
+    └── RepositoryServiceProvider.php       # Binds Interface to Repository
 
-## Contributing
+resources/views/documents/
+└── index.blade.php                         # Upload form & file lists (Public/Private)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+storage/
+├── app/public/documents/                   # Publicly accessible files
+└── app/private_documents/                  # Secure, non-web-accessible files
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+📦 Installation & Setup
+Follow these steps to get the project running locally:
+Prerequisites
+PHP 8.2 or higher
+Composer
+MySQL
+Git
+Step-by-Step Setup
+1. **Clone the repository** :
+       git clone https://github.com/YOUR_USERNAME/repository_file_upload.git
+        cd repository_file_upload
+2. **Install PHP dependencies** :
+       composer install
+3.  **Setup Environment**:
+    Copy the example environment file: cp .env.example .env
+    Update your database credentials in the .env file:
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=repository_fileUpload
+    DB_USERNAME=root
+    DB_PASSWORD=
+4. **Generate Application Key**:
+       php artisan key:generate
+5. **Run Migrations**:
+       php artisan migrate
+6. **Create Storage Symlink (CRUCIAL for Public Files)**:
+    php artisan storage:link
+7. **Start Development Server**:
+    php artisan serve
+    
 
-## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
